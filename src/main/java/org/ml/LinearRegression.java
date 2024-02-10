@@ -1,10 +1,12 @@
 package org.ml;
 import mikera.matrixx.Matrix;
 import mikera.vectorz.Vector;
+import mikera.matrixx.algo.Multiplications;
+import mikera.vectorz.Vectorz;
 
 import java.util.Random;
 
-public class LinearRegression<T extends Number> {
+public class LinearRegression {
     private double learning_rate;
     private double regularization;
     private Vector weights;
@@ -20,7 +22,7 @@ public class LinearRegression<T extends Number> {
         int number_of_samples = data_with_bias.rowCount();
         int number_of_features = data_with_bias.columnCount();
 
-        weights = Utils.uniformVector(number_of_features, 0, 0.1);
+        weights = Vector.create(Vectorz.createUniformRandomVector(number_of_features));
 
         for (int ep = 0; ep < epochs; ep++) {
             for (int i = 0; i < (number_of_samples - (number_of_samples % batch_size)); i += batch_size) {
@@ -47,8 +49,7 @@ public class LinearRegression<T extends Number> {
             Vector y_true = targets;
             Matrix matrix_weights = Matrix.create(new double[][]{weights.toDoubleArray()}).toMatrixTranspose();
 
-            //TODO: MISMATCHED SIZED MULTIPLYCOPY
-            Matrix y_pred = (Matrix) data_with_bias.multiplyCopy(matrix_weights);
+            Matrix y_pred = Multiplications.multiply(data_with_bias, matrix_weights);
             y_pred = y_pred.toMatrixTranspose();
             Vector vectorized_preds = Vector.create(y_pred.getRow(0));
 
