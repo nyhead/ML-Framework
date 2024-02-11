@@ -3,6 +3,7 @@ import mikera.matrixx.Matrix;
 import mikera.vectorz.Vector;
 import mikera.matrixx.algo.Multiplications;
 import mikera.vectorz.Vectorz;
+import mikera.vectorz.impl.ZeroVector;
 
 import java.util.Random;
 
@@ -26,8 +27,7 @@ public class LinearRegression {
 
         for (int ep = 0; ep < epochs; ep++) {
             for (int i = 0; i < (number_of_samples - (number_of_samples % batch_size)); i += batch_size) {
-                Vector gradient = Vector.createLength(number_of_features);
-                gradient.fill(0);
+                Vector gradient = Vector.create(ZeroVector.create(number_of_features));
                 for (int j = i; j < i + batch_size; j++) {
                     Vector sample = Vector.create(data_with_bias.getRow(j));
                     double target = targets.get(j);
@@ -47,28 +47,23 @@ public class LinearRegression {
                 weights.sub(weights_update);
             }
             Vector y_true = targets;
+
             Matrix matrix_weights = Matrix.create(new double[][]{weights.toDoubleArray()}).toMatrixTranspose();
 
             Matrix y_pred = Multiplications.multiply(data_with_bias, matrix_weights);
             y_pred = y_pred.toMatrixTranspose();
             Vector vectorized_preds = Vector.create(y_pred.getRow(0));
-
+            System.out.println(weights);
             System.out.println("Epoch: " + (ep + 1) + ", RMSE: " + Utils.rmse(y_true, vectorized_preds));
         }
     }
 
-    public double predict(Vector v) {
-        Matrix new_mat = Matrix.create(v);
-        Matrix to_predict = Utils.addBiasColumn(new_mat);
-        if (to_predict.columnCount() != weights.length())
-            throw new IllegalArgumentException("Number of features differs from the train set");
-        return to_predict.multiplyCopy(weights).get(0,0);
-    }
-
     public Vector predict(Matrix M) {
         Matrix to_predict = Utils.addBiasColumn(M);
-        to_predict.multiply(weights);
-        Vector res = Vector.create(to_predict.toMatrixTranspose().getRow(0));;
-        return res;
+        Matrix matrix_weights = Matrix.create(new double[][]{weights.toDoubleArray()}).toMatrixTranspose();
+
+        Matrix y_pred = Multiplications.multiply(to_predict, matrix_weights);
+        Vector vectorized_preds = Vector.create(y_pred.toMatrixTranspose().getRow(0));
+        return vectorized_preds;
     }
 }
