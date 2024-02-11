@@ -2,6 +2,8 @@ package org.ml;
 
 import mikera.matrixx.Matrix;
 import mikera.vectorz.Vector;
+import mikera.vectorz.impl.ArraySubVector;
+import mikera.vectorz.impl.GrowableIndexedVector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,19 +57,20 @@ public class Utils {
     }
 
     public static Matrix addBiasColumn(Matrix M) {
-        Matrix mat = M.copy(); // Get the original matrix data
-
+        var shape = M.getShape();
+        shape[1] += 1;
+        Matrix mat = Matrix.create(shape); // Get the original matrix data
         // Iterate over each row of the matrix
-        for (var row : mat) {
-            // Assuming T can be an Integer, we add 1 as the bias.
-            // This requires casting since our matrix is generic.
-            // This is a limitation in Java compared to C++ templates.
-            row.add(1.0);
+        for (int i = 0; i < mat.rowCount(); i++) {
+                ArraySubVector row = M.getRow(i);
+                GrowableIndexedVector newRow = GrowableIndexedVector.create(row);
+                newRow.append(1.0);
+                mat.setRow(i, newRow);
         }
 
         // Create a new Matrix with the modified matrix data
-        Matrix res = new Matrix(mat);
-        return res;
+//        Matrix res = new Matrix(mat);
+        return mat;
     }
     public static Matrix uniformMatrix(int height, int width, double mean, double std) {
         Random random = new Random();

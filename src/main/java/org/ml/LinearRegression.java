@@ -37,7 +37,7 @@ public class LinearRegression {
                     predicted = predicted - target;
 
                     sample.multiply(predicted);
-                    Vector grad = (Vector) sample.divideCopy(batch_size);
+                    Vector grad = sample.divideCopy(batch_size).toVector();
 
                     gradient.add(grad);
                 }
