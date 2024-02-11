@@ -17,11 +17,12 @@ public class LinearRegression {
         this.regularization = regularization;
     }
 
-    public void fit(Matrix data, Vector targets, int epochs, int batch_size) throws Exception {
-        Matrix data_with_bias = Utils.addBiasColumn(data);
+    public void fit(Utils.TrainTestSplitResult tts, int epochs, int batch_size) throws Exception {
+        Vector y_train = tts.y_train;
+        Matrix X_train = Utils.addBiasColumn(tts.X_train);
 
-        int number_of_samples = data_with_bias.rowCount();
-        int number_of_features = data_with_bias.columnCount();
+        int number_of_samples = X_train.rowCount();
+        int number_of_features = X_train.columnCount();
 
         weights = Vector.create(Vectorz.createUniformRandomVector(number_of_features));
 
@@ -29,8 +30,8 @@ public class LinearRegression {
             for (int i = 0; i < (number_of_samples - (number_of_samples % batch_size)); i += batch_size) {
                 Vector gradient = Vector.create(ZeroVector.create(number_of_features));
                 for (int j = i; j < i + batch_size; j++) {
-                    Vector sample = Vector.create(data_with_bias.getRow(j));
-                    double target = targets.get(j);
+                    Vector sample = Vector.create(X_train.getRow(j));
+                    double target = y_train.get(j);
 
                     double predicted = sample.innerProduct(weights).get();
 
@@ -46,20 +47,16 @@ public class LinearRegression {
                 Vector weights_update = gradient.multiplyCopy(learning_rate);
                 weights.sub(weights_update);
             }
-            Vector y_true = targets;
 
-            Matrix matrix_weights = Matrix.create(new double[][]{weights.toDoubleArray()}).toMatrixTranspose();
-
-            Matrix y_pred = Multiplications.multiply(data_with_bias, matrix_weights);
-            y_pred = y_pred.toMatrixTranspose();
-            Vector vectorized_preds = Vector.create(y_pred.getRow(0));
+            Vector train_predict = predict(X_train, false);
+            Vector test_predict = predict(tts.X_test, true);
             System.out.println(weights);
-            System.out.println("Epoch: " + (ep + 1) + ", RMSE: " + Utils.rmse(y_true, vectorized_preds));
+            System.out.println("Epoch: " + (ep + 1) + ", Train RMSE: " + Utils.rmse(y_train, train_predict) + ", Test RMSE: " + Utils.rmse(tts.y_test, test_predict));
         }
     }
 
-    public Vector predict(Matrix M) {
-        Matrix to_predict = Utils.addBiasColumn(M);
+    public Vector predict(Matrix M, boolean bias) {
+        Matrix to_predict = bias ? Utils.addBiasColumn(M) : M;
         Matrix matrix_weights = Matrix.create(new double[][]{weights.toDoubleArray()}).toMatrixTranspose();
 
         Matrix y_pred = Multiplications.multiply(to_predict, matrix_weights);

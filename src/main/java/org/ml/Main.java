@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String csvFile = "D:/winter-2023/java_related/ML-Framework/diabetes.csv";
+        String csvFile = "D:/winter-2023/java_related/ML-Framework/generated_regression_data.csv";
         BufferedReader br = new BufferedReader(new FileReader(csvFile));
         String line;
         ArrayList<Double> targets = new ArrayList<>();
@@ -38,21 +38,14 @@ public class Main {
         double[] arrayTargets = targets.stream().mapToDouble(d -> d).toArray();
         //TODO implement train test split function
 
-        Utils.TrainTestSplitResult train_test_split = Utils.trainTestSplit(arrayData, arrayTargets,0.75, 92);
-        Matrix train_data = train_test_split.X_train;
-        Vector train_target = train_test_split.y_train;
-        Matrix XT = train_data.toMatrixTranspose();
-        Matrix XTX = Matrix.create(Multiplications.multiply(XT, train_data).inverse());
-        Matrix res = Matrix.create(Multiplications.multiply(XTX, XT).multiplyCopy(train_target));
-
-//        Matrix to_predict = Utils.addBiasColumn(train_test_split.X_test);
-        Matrix to_predict = train_test_split.X_test;
-        Matrix y_pred = Multiplications.multiply(to_predict, res);
-        Vector vectorized_preds = Vector.create(y_pred.toMatrixTranspose().getRow(0));
-        System.out.println("RMSE: " + Utils.rmse(train_test_split.y_test, vectorized_preds));
-
-//        model.fit(train_data, train_target, 50,10);
-//        Vector out = model.predict(train_test_split.X_test);
+        Utils.TrainTestSplitResult train_test_split = Utils.trainTestSplit(arrayData, arrayTargets, .50, 92);
+//        Matrix XT = train_data.toMatrixTranspose();
+//        Matrix XTX = Matrix.create(Multiplications.multiply(XT, train_data).inverse());
+//        Matrix res = Multiplications.multiply(Multiplications.multiply(XTX, XT), Matrix.create(train_target));
+//
+//        System.out.println("RMSE: " + Utils.rmse(y_true, vectorized_preds));
+        LinearRegression model = new LinearRegression(0.01,0.1);
+        model.fit(train_test_split, 500,50);
         }
     }
 
