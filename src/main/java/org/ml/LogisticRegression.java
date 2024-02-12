@@ -50,6 +50,15 @@ public class LogisticRegression {
             Matrix probabilities = predictProbs(tts.X_train);
             Vector yPred = predict(tts.X_train);
             Vector yTrue = tts.y_train;
+
+            //implement this.Predict, Utils.softmax(Matrix),
+            // Utils.crossEntropy, Utils.accuracy
+
         }
+    }
+
+    private Matrix predictProbs(Matrix unbiased) {
+        Matrix biasedX = Utils.addBiasColumn((unbiased));
+        return Utils.softmax(Multiplications.multiply(biasedX, weights));
     }
 }

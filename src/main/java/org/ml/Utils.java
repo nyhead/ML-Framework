@@ -44,6 +44,17 @@ public class Utils {
     static double sigmoid(double x) {
         return (1 / (1 + exp(x)));
     }
+    static Vector softmax(Vector v) {
+        double max = v.elementMax();
+        Vector maxSubV = v.clone();
+        maxSubV.sub(max);
+        maxSubV.exp();
+        return maxSubV;
+    }
+
+    static Matrix softmax(Matrix m) {
+
+    }
     static Matrix oneHot(Vector targets) {
         double[] target_vals = targets.asDoubleArray();
         int max = (int) Arrays.stream(target_vals).max().orElse(0.0);
