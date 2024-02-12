@@ -51,7 +51,7 @@ public class LogisticRegression {
             Vector yPred = predict(tts.X_train);
             Vector yTrue = tts.y_train;
 
-            //implement this.Predict, Utils.softmax(Matrix),
+            //TODO implement this.Predict, Utils.softmax(Matrix),
             // Utils.crossEntropy, Utils.accuracy
 
         }
