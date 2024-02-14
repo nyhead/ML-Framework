@@ -1,17 +1,14 @@
 package org.ml;
 
-import mikera.matrixx.Matrix;
-import mikera.matrixx.algo.Multiplications;
-import mikera.vectorz.Vector;
-import mikera.vectorz.Vectorz;
-import mikera.vectorz.util.DoubleArrays;
+import mikera.vectorz.ops.Log;
+import org.ml.util.Util;
 
 import java.io.*;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String csvFile = "D:/winter-2023/java_related/ML-Framework/generated_regression_data.csv";
+        String csvFile = "D:/winter-2023/java_related/ML-Framework/logistic_regression.csv";
         BufferedReader br = new BufferedReader(new FileReader(csvFile));
         String line;
         ArrayList<Double> targets = new ArrayList<>();
@@ -36,16 +33,16 @@ public class Main {
                 .map(l -> l.stream().mapToDouble(Double::doubleValue).toArray())
                 .toArray(double[][]::new);
         double[] arrayTargets = targets.stream().mapToDouble(d -> d).toArray();
-        //TODO implement train test split function
 
-        Utils.TrainTestSplitResult train_test_split = Utils.trainTestSplit(arrayData, arrayTargets, .50, 92);
+        int seed = 42;
+        Util.TrainTestSplitResult train_test_split = Util.trainTestSplit(arrayData, arrayTargets, .85, seed);
 //        Matrix XT = train_data.toMatrixTranspose();
 //        Matrix XTX = Matrix.create(Multiplications.multiply(XT, train_data).inverse());
 //        Matrix res = Multiplications.multiply(Multiplications.multiply(XTX, XT), Matrix.create(train_target));
 //
 //        System.out.println("RMSE: " + Utils.rmse(y_true, vectorized_preds));
-        LinearRegression model = new LinearRegression(0.01,0.1);
-        model.fit(train_test_split, 500,50);
+        LogisticRegression model = new LogisticRegression(0.01,0.5, seed);
+        model.fit(train_test_split, 9,10);
         }
     }
 
