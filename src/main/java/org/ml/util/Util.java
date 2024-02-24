@@ -74,17 +74,6 @@ public class Util {
         return result;
     }
 
-//    public static Matrix oneHot(Vector targets) {
-//        double[] target_vals = targets.asDoubleArray();
-//        int max = (int) Arrays.stream(target_vals).max().orElse(0.0);
-//        Vector v = Vector.createLength(max + 1);
-//        v.fill(0);
-//        Matrix res_mat = Matrix.wrap(targets.length(), 1, v.asDoubleArray());
-//        for (int i = 0; i < targets.length(); i++) {
-//            res_mat.set(i, (int) target_vals[i], 1);
-//        }
-//        return res_mat;
-//    }
 public static Matrix oneHot(Vector targets) {
     int numClasses = (int) targets.elementMax() + 1;
     Matrix result = Matrix.create(targets.length(), numClasses);

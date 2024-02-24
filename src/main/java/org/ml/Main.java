@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        String csvFile = "D:/winter-2023/java_related/ML-Framework/logistic_regression.csv";
+        String csvFile = "D:/winter-2023/java_related/ML-Framework/generated_data.csv";
         BufferedReader br = new BufferedReader(new FileReader(csvFile));
         String line;
         ArrayList<Double> targets = new ArrayList<>();
@@ -41,7 +41,7 @@ public class Main {
 //        Matrix res = Multiplications.multiply(Multiplications.multiply(XTX, XT), Matrix.create(train_target));
 //
 //        System.out.println("RMSE: " + Utils.rmse(y_true, vectorized_preds));
-        LogisticRegression model = new LogisticRegression(0.01,0.5, seed);
+        LinearRegression model = new LinearRegression(0.01,0.5, seed);
         model.fit(train_test_split, 9,10);
         }
     }

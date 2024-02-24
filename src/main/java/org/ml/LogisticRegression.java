@@ -5,7 +5,12 @@ import mikera.vectorz.GrowableVector;
 import mikera.vectorz.Vector;
 import mikera.matrixx.Matrix;
 import mikera.matrixx.algo.Multiplications;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
 import org.ml.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class LogisticRegression {
@@ -29,6 +34,7 @@ public class LogisticRegression {
         int classesCount = oneHotYtrain.getShape()[1];
 
         weights = Util.uniformMatrix(featuresCount, classesCount, 0, 0.1, seed);
+        List<Double> lossValues = new ArrayList<>();
 
         for (int epoch = 1; epoch < epochs + 1; epoch++) {
             for (int i = 0; i < samplesCount; i += batch_size) {
@@ -56,12 +62,32 @@ public class LogisticRegression {
             Matrix probabilities = predictProbs(tts.X_train);
             Vector yPred = predict(tts.X_train);
             Vector yTrue = tts.y_train;
-
+            double loss = Util.crossEntropy(oneHotYtrain, probabilities);
+            lossValues.add(loss);
             System.out.println("Epoch: " + epoch + ", Loss(Cross-Entropy): "
                     + Util.crossEntropy(oneHotYtrain, probabilities) + Util.accuracy(yTrue, yPred));
         }
-    }
+        plotLoss(lossValues, epochs);
 
+    }
+    private void plotLoss(List<Double> lossValues, int epochs) {
+        // Create a chart
+        XYChart chart = new XYChart(600,  400);
+        chart.setTitle("Loss over Epochs");
+        chart.setXAxisTitle("Epochs");
+        chart.setYAxisTitle("Loss (Cross-Entropy)");
+
+        // Add loss series
+        double[] xData = new double[epochs];
+        for (int i =  0; i < epochs; i++) {
+            xData[i] = i +  1; // Epoch numbers
+        }
+        double[] yData = lossValues.stream().mapToDouble(Double::doubleValue).toArray();
+        chart.addSeries("Loss", xData, yData);
+
+        // Show the chart
+        new SwingWrapper<>(chart).displayChart();
+    }
     private Matrix predictProbs(Matrix unbiased) {
         Matrix biasedX = Util.addBiasColumn((unbiased));
         return Util.softmax(Multiplications.multiply(biasedX, weights));

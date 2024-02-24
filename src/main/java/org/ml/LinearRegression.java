@@ -7,6 +7,12 @@ import mikera.vectorz.Vectorz;
 import mikera.vectorz.impl.ZeroVector;
 import org.ml.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
 public class LinearRegression {
     private double learningRate;
     private double regularization;
@@ -27,6 +33,9 @@ public class LinearRegression {
         int featuresCount = X_train.columnCount();
 
         weights = Util.uniformVector(featuresCount, 0, 0.1, seed);
+        List<Double> trainRmseValues = new ArrayList<>();
+        List<Double> testRmseValues = new ArrayList<>();
+
         for (int ep = 0; ep < epochs; ep++) {
             for (int i = 0; i < (samplesCount - (samplesCount % batch_size)); i += batch_size) {
                 Vector gradient = Vector.create(ZeroVector.create(featuresCount));
@@ -52,8 +61,36 @@ public class LinearRegression {
             Vector train_predict = predict(X_train, false);
             Vector test_predict = predict(tts.X_test, true);
             System.out.println(weights);
+            double trainRmse = Util.rmse(y_train, train_predict);
+            double testRmse = Util.rmse(tts.y_test, test_predict);
+            trainRmseValues.add(trainRmse);
+            testRmseValues.add(testRmse);
             System.out.println("Epoch: " + (ep + 1) + ", Train RMSE: " + Util.rmse(y_train, train_predict) + ", Test RMSE: " + Util.rmse(tts.y_test, test_predict));
         }
+        plotRmse(trainRmseValues, testRmseValues, epochs);
+
+    }
+    private void plotRmse(List<Double> trainRmseValues, List<Double> testRmseValues, int epochs) {
+        // Create a chart
+        XYChart chart = new XYChart(600,  400);
+        chart.setTitle("RMSE over Epochs");
+        chart.setXAxisTitle("Epochs");
+        chart.setYAxisTitle("RMSE");
+
+        // Add train RMSE series
+        double[] trainXData = new double[epochs];
+        for (int i =  0; i < epochs; i++) {
+            trainXData[i] = i +  1; // Epoch numbers
+        }
+        double[] trainYData = trainRmseValues.stream().mapToDouble(Double::doubleValue).toArray();
+        chart.addSeries("Train", trainXData, trainYData);
+
+        // Add test RMSE series
+        double[] testYData = testRmseValues.stream().mapToDouble(Double::doubleValue).toArray();
+        chart.addSeries("Test", trainXData, testYData);
+
+        // Show the chart
+        new SwingWrapper<>(chart).displayChart();
     }
 
     public Vector predict(Matrix M, boolean bias) {
